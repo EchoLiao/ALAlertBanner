@@ -72,9 +72,10 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
 @implementation UIColor (LightAndDark)
 
 - (UIColor *)darkerColor {
+    CGFloat rate = ([[[UIDevice currentDevice] systemVersion] floatValue] < 7.0) ? 0.75 : 0.9;
     CGFloat h, s, b, a;
     if ([self getHue:&h saturation:&s brightness:&b alpha:&a])
-        return [UIColor colorWithHue:h saturation:s brightness:b * 0.75 alpha:a];
+        return [UIColor colorWithHue:h saturation:s brightness:b * rate alpha:a];
     return nil;
 }
 
@@ -721,11 +722,13 @@ static CGFloat const kForceHideAnimationDuration = 0.1f;
     
     CGGradientRelease(gradient);
     CGColorSpaceRelease(colorSpace);
-    
-    CGContextSetFillColorWithColor(context, [UIColor colorWithRed:0.f green:0.f blue:0.f alpha:0.6f].CGColor);
-    CGContextFillRect(context, CGRectMake(0.f, rect.size.height - 1.f, rect.size.width, 1.f));
-    CGContextSetFillColorWithColor(context, [UIColor colorWithRed:1.f green:1.f blue:1.f alpha:0.3f].CGColor);
-    CGContextFillRect(context, CGRectMake(0.f, 0.f, rect.size.width, 1.f));
+
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] < 7.0) {
+        CGContextSetFillColorWithColor(context, [UIColor colorWithRed:0.f green:0.f blue:0.f alpha:0.6f].CGColor);
+        CGContextFillRect(context, CGRectMake(0.f, rect.size.height - 1.f, rect.size.width, 1.f));
+        CGContextSetFillColorWithColor(context, [UIColor colorWithRed:1.f green:1.f blue:1.f alpha:0.3f].CGColor);
+        CGContextFillRect(context, CGRectMake(0.f, 0.f, rect.size.width, 1.f));
+    }
 }
 
 - (id)nextAvailableViewController:(id)view {
